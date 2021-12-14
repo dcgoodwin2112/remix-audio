@@ -1,49 +1,33 @@
 import { useWebAudioSynth } from "../hooks/useWebAudioSynth";
 import SynthKey from "./SynthKey";
 
+const synthKeys = [
+  { buttonNote: "C4", label: "C" },
+  { buttonNote: "C#4", label: "C♯ / D♭" },
+  { buttonNote: "D4", label: "D" },
+  { buttonNote: "D#4", label: "D♯ / E♭" },
+  { buttonNote: "E4", label: "E" },
+  { buttonNote: "F4", label: "F" },
+  { buttonNote: "F#4", label: "F♯ / G♭" },
+  { buttonNote: "G4", label: "G" },
+  { buttonNote: "G#4", label: "G♯ / A♭" },
+  { buttonNote: "A4", label: "A" },
+  { buttonNote: "A#4", label: "A♯ / B♭" },
+  { buttonNote: "B4", label: "B" },
+  { buttonNote: "C5", label: "C" },
+] as const;
+
 export default function Synth() {
   const [note, setNote] = useWebAudioSynth();
   return (
     <div>
-      <SynthKey buttonNote="C4" {...{ note, setNote }}>
-        C
-      </SynthKey>
-      <SynthKey buttonNote="C#4" {...{ note, setNote }}>
-        C♯ / D♭
-      </SynthKey>
-      <SynthKey buttonNote="D4" {...{ note, setNote }}>
-        D
-      </SynthKey>
-      <SynthKey buttonNote="D#4" {...{ note, setNote }}>
-        D♯ / E♭
-      </SynthKey>
-      <SynthKey buttonNote="E4" {...{ note, setNote }}>
-        E
-      </SynthKey>
-      <SynthKey buttonNote="F4" {...{ note, setNote }}>
-        F
-      </SynthKey>
-      <SynthKey buttonNote="F#4" {...{ note, setNote }}>
-        F♯ / G♭
-      </SynthKey>
-      <SynthKey buttonNote="G4" {...{ note, setNote }}>
-        G
-      </SynthKey>
-      <SynthKey buttonNote="G#4" {...{ note, setNote }}>
-        G♯ / A♭
-      </SynthKey>
-      <SynthKey buttonNote="A4" {...{ note, setNote }}>
-        A
-      </SynthKey>
-      <SynthKey buttonNote="A#4" {...{ note, setNote }}>
-        A♯ / B♭
-      </SynthKey>
-      <SynthKey buttonNote="B4" {...{ note, setNote }}>
-        B
-      </SynthKey>
-      <SynthKey buttonNote="C5" {...{ note, setNote }}>
-        C
-      </SynthKey>
+      {synthKeys.map(({ buttonNote, label }) => {
+        return (
+          <SynthKey buttonNote={buttonNote} {...{ note, setNote }}>
+            {label}
+          </SynthKey>
+        );
+      })}
     </div>
   );
 }
