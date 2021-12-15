@@ -4,7 +4,7 @@ interface Options {
   note?: Note;
   duration?: number;
 }
-// Hack to prevent a new AudioContext to be created on every note
+
 let audioCtx: AudioContext;
 export default async function playSynth({
   note = "C4",
@@ -30,7 +30,7 @@ export default async function playSynth({
 
   // -- reverb gain
   const reverbGain = audioCtx.createGain();
-  reverbGain.gain.value = 0.15;
+  reverbGain.gain.value = 0.12;
 
   // -- post-filter gain
   const postFilterGain = audioCtx.createGain();
@@ -40,7 +40,7 @@ export default async function playSynth({
 
   const filter = audioCtx.createBiquadFilter();
   filter.type = "lowpass";
-  filter.frequency.value = 522;
+  filter.frequency.value = 512;
 
   // LFO Gain 🎹
 
