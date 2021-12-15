@@ -14,6 +14,8 @@ export default async function playSynth({
     audioCtx = new window.AudioContext();
   }
 
+  // Reverb 🎹
+
   async function createReverb() {
     const convolver = audioCtx.createConvolver();
     const response = await fetch("../assets/IRx1000_02C.wav");
@@ -23,55 +25,82 @@ export default async function playSynth({
   }
 
   const reverb = await createReverb();
-  const reverbGain = audioCtx.createGain();
-  reverbGain.gain.value = 0.1;
-  reverb.connect(reverbGain);
-  reverbGain.connect(audioCtx.destination);
 
+  // Reverb Wet/Dry Mix 🎹
+  
+  // -- reverb gain
+  const reverbGain = audioCtx.createGain();
+  reverbGain.gain.value = 0.15;
+  
+  // -- post-filter gain
+  const postFilterGain = audioCtx.createGain();
+  postFilterGain.gain.value = 0.7;
+  
+  // Filter 🎹
   const filter = audioCtx.createBiquadFilter();
   filter.type = "lowpass";
-  filter.connect(reverb);
-
-  const postFilterGain = audioCtx.createGain();
-  postFilterGain.gain.value = 0.9;
-  filter.connect(postFilterGain);
-  postFilterGain.connect(audioCtx.destination);
-
-  const oscillators: OscillatorNode[] = [];
-
-  // Oscillator 1
+  filter.frequency.value = 566;
+  
+  // Oscillator Gain 🎹
+ 
+  // -- oscillator1 Gain
   const osc1Gain = audioCtx.createGain();
   osc1Gain.gain.value = 0.45;
-  osc1Gain.connect(filter);
 
-  const oscillator1 = audioCtx.createOscillator();
-  oscillator1.type = "sawtooth";
-  oscillator1.frequency.value = getNoteFrequency(note); // value in hertz
-  oscillator1.connect(osc1Gain);
-  oscillators.push(oscillator1);
-
-  // Oscillator2
+  // -- oscillator2 Gain
   const osc2Gain = audioCtx.createGain();
   osc2Gain.gain.value = 0.20;
-  osc2Gain.connect(filter);
 
-  const oscillator2 = audioCtx.createOscillator();
-  oscillator2.type = "triangle";
-  oscillator2.frequency.value = getOctaveFrequency(note, "down"); // value in hertz
-  oscillator2.connect(osc2Gain);
-  oscillators.push(oscillator2);
-
-  //Oscillator3
+  // -- oscillator3 Gain
   const osc3Gain = audioCtx.createGain();
   osc3Gain.gain.value = 0.20;
-  osc3Gain.connect(filter);
 
+  // Oscillators 🎹
+  
+  const oscillators: OscillatorNode[] = [];
+  
+  // -- oscillator 1
+  const oscillator1 = audioCtx.createOscillator();
+  oscillator1.type = "sawtooth";
+  oscillator1.frequency.value = getNoteFrequency(note);
+  oscillators.push(oscillator1);
+  
+   // -- oscillator2
+  const oscillator2 = audioCtx.createOscillator();
+  oscillator2.type = "triangle";
+  oscillator2.frequency.value = getOctaveFrequency(note, "down");
+  oscillators.push(oscillator2);
+  
+  // -- oscillator3
   const oscillator3 = audioCtx.createOscillator();
   oscillator3.type = "square";
-  oscillator3.frequency.value = getOctaveFrequency(note, "up"); // value in hertz
-  oscillator3.connect(osc3Gain);
+  oscillator3.frequency.value = getOctaveFrequency(note, "up");
   oscillators.push(oscillator3);
+  
+  // Patch Bay 🎹
 
+  // -- Filter Gain and Reverb to OUTPUT
+  postFilterGain.connect(audioCtx.destination);
+  reverb.connect(audioCtx.destination);
+
+  // -- ReverbGain to  Reverb
+  reverbGain.connect(reverb)
+
+  // -- Filter Wet/Dry to Reverb and OUT
+  filter.connect(reverbGain);
+  filter.connect(postFilterGain);
+  
+  // -- oscillator Gain
+  osc1Gain.connect(filter);
+  osc3Gain.connect(filter);
+  osc2Gain.connect(filter);
+  
+  // -- oscillators
+  oscillator1.connect(osc1Gain);
+  oscillator2.connect(osc2Gain);
+  oscillator3.connect(osc3Gain);
+  
+  // PLAY SYNTH!
   oscillators.forEach((osc) => {
     osc.start(audioCtx.currentTime);
     osc.stop(audioCtx.currentTime + duration);
